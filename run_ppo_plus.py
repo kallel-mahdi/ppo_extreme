@@ -78,7 +78,7 @@ parser.add_argument('--num_epochs',type=int,default=25)
 parser.add_argument('--activation_fn',type=str,default='silu')
 parser.add_argument('--stable_scheme',type=str2bool,default=True)
 parser.add_argument('--bound_actions',type=str2bool,default=True)
-parser.add_argument('--optimizer',type=str,default='sgd', choices=['adam', 'sgd'])
+parser.add_argument('--optimizer',type=str,default='sgd', choices=['adam','rmsprop', 'sgd','adamw'])
 parser.add_argument('--spo_loss',type=str2bool,default=True)
 
 args = parser.parse_args()

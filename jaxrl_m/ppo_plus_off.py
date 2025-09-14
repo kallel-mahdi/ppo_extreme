@@ -543,17 +543,39 @@ def create_learner(
     temp_def = Temperature(config.ppo.temperature)
     temp_params = temp_def.init(rng)['params']
     
-    tx = optax.chain(
-        optax.clip_by_global_norm(config.optimizer.clip_grad_norm),
-        optax.adam(
+    
+    
+    
+    if config.optimizer.optimizer == "adamw":
+        tx = optax.adamw(
             learning_rate=config.optimizer.actor_lr,
             b1=config.optimizer.momentum,
             b2=config.optimizer.b2
-        ) if config.optimizer.optimizer == "adam" else optax.sgd(
+        )
+    elif config.optimizer.optimizer == "adam":
+        tx = optax.adam(
+            learning_rate=config.optimizer.actor_lr,
+            b1=config.optimizer.momentum,
+            b2=config.optimizer.b2
+        )
+    elif config.optimizer.optimizer == "rmsprop":
+        tx = optax.rmsprop(
+            learning_rate=config.optimizer.actor_lr,
+            momentum=config.optimizer.momentum,
+            b2=config.optimizer.b2
+        )
+    elif config.optimizer.optimizer == "sgd":
+        tx = optax.sgd(
             learning_rate=config.optimizer.actor_lr,
             momentum=config.optimizer.momentum
-        ),
+        )
+        
+    tx = optax.chain(
+        optax.clip_by_global_norm(config.optimizer.clip_grad_norm),
+        tx
     )
+    
+
     actor = TrainState.create(apply_fn=actor_def.apply, params=actor_params, tx=tx)
     temp = TrainState.create(
         apply_fn=temp_def.apply, 
